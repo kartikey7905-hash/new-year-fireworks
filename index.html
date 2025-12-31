@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Happy New Year Surprise</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        /*  AURORA BLUE BACKGROUND */
+        body{
+            height:100vh;
+            overflow:hidden;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0,255,255,0.35), transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(0,140,255,0.45), transparent 45%),
+                radial-gradient(circle at 50% 80%, rgba(0,200,255,0.35), transparent 50%),
+                linear-gradient(120deg, #020024, #050b4a, #001f3f);
+            animation: aurora 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora{
+            0%{
+                filter: hue-rotate(0deg);
+            }
+            100%{
+                filter: hue-rotate(20deg);
+            }
+        }
+
+        canvas{
+            position:fixed;
+            top:0;
+            left:0;
+            z-index:1;
+        }
+
+        .container{
+            color : blue;
+            position:relative;
+            z-index:2;
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            text-align:center;
+            color:white;
+            background:rgba(0,0,0,0.35);
+            padding:20px;
+        }
+
+        h1{
+            font-size:3rem;
+            margin-bottom:15px;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow{
+            from{ text-shadow:0 0 10px #00ffff; }
+            to{ text-shadow:0 0 35px #00ffff; }
+        }
+
+        #greeting{
+            font-size:1.4rem;
+            font-style:italic;
+            margin:20px 0;
+            min-height:60px;
+            animation: fade 1s ease;
+            color:#e0faff;
+        }
+
+        @keyframes fade{
+            from{ opacity:0; transform:translateY(10px); }
+            to{ opacity:1; transform:translateY(0); }
+        }
+
+        button{
+            padding:14px 32px;
+            font-size:1.1rem;
+            border:none;
+            border-radius:30px;
+            background:#00e5ff;
+            cursor:pointer;
+            transition:0.3s;
+            margin-top:10px;
+        }
+
+        button:hover{
+            background:white;
+        }
+
+        .credit{
+            margin-top:30px;
+            font-size:1rem;
+            opacity:0.8;
+            letter-spacing:1px;
+            color:#ccefff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks"></canvas>
+
+    <div class="container">
+        <h1>🎉 Happy New Year 2026 🎉</h1>
+
+        <p id="greeting">
+            Click the button to see a New Year wish ✨
+        </p>
+
+        <button id="surpriseBtn" onclick="startSurprise()">🎁 Surprise</button>
+
+        <p class="credit">— Made by Kartikey</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("fireworks");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const greetings = [
+            "A new year begins with new hopes—may every dream find its way to reality.",
+            "May the coming year fill your life with peace, purpose, and prosperity.",
+            "New beginnings, brighter days, and endless possibilities await you.",
+            "Let go of the past and welcome the magic of a brand-new year.",
+            "May every sunrise bring new opportunities and every night bring peace.",
+            "This year, choose happiness, courage, and kindness.",
+            "A fresh chapter begins—make it unforgettable."
+        ];
+
+        let particles = [];
+        let fireworksActive = false;
+
+        function startSurprise(){
+            const randomIndex = Math.floor(Math.random() * greetings.length);
+            document.getElementById("greeting").innerText = greetings[randomIndex];
+            fireworksActive = true;
+            document.getElementById("surpriseBtn").innerText = "Click Again";
+        }
+
+        class Particle{
+            constructor(x,y,color){
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random()*2.5+1;
+                this.vx = Math.random()*7-3.5;
+                this.vy = Math.random()*7-3.5;
+                this.life = 100;
+            }
+
+            update(){
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.04;
+                this.life--;
+            }
+
+            draw(){
+                ctx.beginPath();
+                ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function createFirework(){
+            const x = Math.random()*canvas.width;
+            const y = Math.random()*canvas.height*0.6;
+            const colors = ["#00ffff","#00bfff","#7fffd4","#ffffff","#1e90ff"];
+
+            for(let i=0;i<75;i++){
+                particles.push(
+                    new Particle(
+                        x,
+                        y,
+                        colors[Math.floor(Math.random()*colors.length)]
+                    )
+                );
+            }
+        }
+
+        function animate(){
+            ctx.fillStyle = "rgba(0,0,0,0.22)";
+            ctx.fillRect(0,0,canvas.width,canvas.height);
+
+            if(fireworksActive && Math.random()<0.06){
+                createFirework();
+            }
+
+            particles.forEach((p,i)=>{
+                p.update();
+                p.draw();
+                if(p.life<=0){
+                    particles.splice(i,1);
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener("resize",()=>{
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+
+</body>
+</html>
